@@ -33,7 +33,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, ready: true },
-  { label: "Produk", href: "/admin/products", icon: Package, ready: false },
+  { label: "Produk", href: "/admin/products", icon: Package, ready: true },
   { label: "Kategori", href: "/admin/categories", icon: Tag, ready: true },
   { label: "Merek", href: "/admin/brands", icon: Tag, ready: true },
   { label: "Pesanan", href: "/admin/orders", icon: ShoppingBag, ready: false },

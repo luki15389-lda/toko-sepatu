@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Izinkan contoh env masuk Git
 !.env.example
+
+# Foto produk hasil upload saat pengembangan lokal
+/public/uploads
