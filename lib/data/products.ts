@@ -12,7 +12,7 @@ export const publicProductWhere = {
   category: { isActive: true },
 } satisfies Prisma.ProductWhereInput;
 
-const cardSelect = {
+export const cardSelect = {
   id: true,
   slug: true,
   name: true,
@@ -28,7 +28,7 @@ const cardSelect = {
   variants: { select: { stock: true, isAvailable: true } },
 } satisfies Prisma.ProductSelect;
 
-type CardRow = Prisma.ProductGetPayload<{ select: typeof cardSelect }>;
+export type CardRow = Prisma.ProductGetPayload<{ select: typeof cardSelect }>;
 
 export type ProductCardData = {
   id: string;
@@ -45,7 +45,7 @@ export type ProductCardData = {
 
 const NEW_PRODUCT_DAYS = 14;
 
-function toCard(row: CardRow): ProductCardData {
+export function toCard(row: CardRow): ProductCardData {
   const totalStock = row.variants
     .filter((v) => v.isAvailable)
     .reduce((sum, v) => sum + v.stock, 0);
