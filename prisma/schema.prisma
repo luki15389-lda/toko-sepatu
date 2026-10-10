@@ -7,18 +7,423 @@ datasource db {
   provider = "postgresql"
 }
 
+// =====================================================
+// ENUM
+// =====================================================
+
+enum Role {
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING_CONFIRMATION // Menunggu Konfirmasi
+  CONFIRMED            // Dikonfirmasi
+  AWAITING_PAYMENT     // Menunggu Pembayaran
+  PROCESSING           // Sedang Diproses
+  READY_FOR_PICKUP     // Siap Diambil
+  COMPLETED            // Selesai
+  CANCELLED            // Dibatalkan
+}
+
+enum PaymentStatus {
+  UNPAID            // Belum Dibayar
+  DP_PARTIAL        // DP Terverifikasi
+  PAID              // Lunas
+  REFUNDED          // Dikembalikan
+  PAYMENT_CANCELLED // Pembayaran Dibatalkan
+}
+
+enum FulfillmentStatus {
+  NOT_READY        // Belum Siap
+  READY_FOR_PICKUP // Siap Diambil
+  PICKED_UP        // Sudah Diambil
+  CANCELLED        // Dibatalkan
+}
+
+enum FulfillmentMethod {
+  PICKUP
+}
+
+enum PaymentKind {
+  DP
+  INSTALLMENT // pembayaran lanjutan
+  FULL
+  REFUND
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CASH
+  OTHER
+}
+
+enum PaymentRecordStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+}
+
+enum StatusKind {
+  ORDER
+  PAYMENT
+  FULFILLMENT
+}
+
+enum InventoryMovementType {
+  INITIAL        // stok awal
+  RESTOCK        // barang masuk
+  ADJUSTMENT     // koreksi manual
+  ORDER_RESERVED // stok ditahan saat pesanan dibuat (jumlah negatif)
+  ORDER_RELEASED // stok dikembalikan saat pesanan dibatalkan (jumlah positif)
+}
+
+// =====================================================
+// ADMIN
+// =====================================================
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(ADMIN)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  paymentsCreated    Payment[]            @relation("PaymentCreatedBy")
+  paymentsVerified   Payment[]            @relation("PaymentVerifiedBy")
+  statusChanges      OrderStatusHistory[]
+  inventoryMovements InventoryMovement[]
+  activityLogs       ActivityLog[]
+
+  @@map("users")
+}
+
+// =====================================================
+// KATALOG
+// =====================================================
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  logoUrl     String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("brands")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  sku            String    @unique
+  brandId        String
+  categoryId     String
+  description    String
+  material       String?
+  specifications String?
+  price          Int
+  discountPrice  Int?
+  isPublished    Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  brand    Brand            @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  category Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images   ProductImage[]
+  variants ProductVariant[]
+  orderItems OrderItem[]
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([isPublished, archivedAt])
+  @@index([createdAt])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+  isPrimary Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id          String   @id @default(cuid())
+  productId   String
+  size        String   // contoh: "42"
+  sku         String   @unique
+  stock       Int      @default(0)
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product            Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems         OrderItem[]
+  inventoryMovements InventoryMovement[]
+
+  @@unique([productId, size])
+  @@index([stock])
+  @@map("product_variants")
+}
+
+// =====================================================
+// PELANGGAN & PESANAN
+// =====================================================
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  whatsapp  String   @unique // format internasional tanpa +, contoh: 6281234567890
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique
+  customerId  String
+
+  // Snapshot data pelanggan saat checkout
+  customerName     String
+  customerWhatsapp String
+  note             String?
+
+  status            OrderStatus       @default(PENDING_CONFIRMATION)
+  paymentStatus     PaymentStatus     @default(UNPAID)
+  fulfillmentStatus FulfillmentStatus @default(NOT_READY)
+  fulfillmentMethod FulfillmentMethod @default(PICKUP)
+
+  // Uang (rupiah, integer)
+  subtotal     Int
+  total        Int
+  dpPercentage Int // snapshot persentase DP saat pesanan dibuat
+  dpAmount     Int // nominal DP yang dianjurkan
+  paidAmount   Int @default(0) // total pembayaran TERVERIFIKASI (dikurangi refund)
+
+  cancelReason String?
+  cancelledAt  DateTime?
+  completedAt  DateTime?
+  stockReleasedAt DateTime? // penanda stok sudah dikembalikan
+
+  customerNote String? // catatan admin yang BOLEH dilihat pelanggan
+  adminNote    String? // catatan internal, tidak pernah ditampilkan ke pelanggan
+
+  accessTokenHash String @unique // hash token rahasia untuk akses pelanggan
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer Customer             @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items    OrderItem[]
+  payments Payment[]
+  history  OrderStatusHistory[]
+
+  @@index([status, createdAt])
+  @@index([paymentStatus])
+  @@index([customerId])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  variantId String
+
+  // Snapshot produk saat checkout (tidak berubah walau produk diedit/diarsipkan)
+  productName String
+  productSku  String
+  brandName   String
+  size        String
+  variantSku  String
+  imageUrl    String?
+  unitPrice   Int
+  quantity    Int
+  lineTotal   Int
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  product Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  inventoryMovements InventoryMovement[]
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("order_items")
+}
+
+// =====================================================
+// PEMBAYARAN
+// =====================================================
+
+model Payment {
+  id          String              @id @default(cuid())
+  orderId     String
+  kind        PaymentKind
+  amount      Int                 // selalu positif; REFUND dihitung sebagai pengurang
+  method      PaymentMethod
+  methodLabel String?             // nama metode jika method = OTHER
+  status      PaymentRecordStatus @default(PENDING_VERIFICATION)
+  paidAt      DateTime
+  verifiedAt  DateTime?
+  verifiedById String?
+  createdById String
+  note        String?
+  createdAt   DateTime            @default(now())
+
+  order      Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  createdBy  User  @relation("PaymentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  verifiedBy User? @relation("PaymentVerifiedBy", fields: [verifiedById], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([status])
+  @@index([paidAt])
+  @@map("payments")
+}
+
+model OrderStatusHistory {
+  id          String     @id @default(cuid())
+  orderId     String
+  kind        StatusKind
+  fromValue   String?
+  toValue     String
+  changedById String?    // null jika dibuat sistem (mis. saat checkout)
+  note        String?
+  visibleToCustomer Boolean @default(true)
+  createdAt   DateTime   @default(now())
+
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  changedBy User? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_histories")
+}
+
+// =====================================================
+// STOK
+// =====================================================
+
+model InventoryMovement {
+  id             String                @id @default(cuid())
+  variantId      String
+  type           InventoryMovementType
+  quantityChange Int                   // positif = masuk, negatif = keluar
+  stockBefore    Int
+  stockAfter     Int
+  orderItemId    String?
+  note           String?
+  createdById    String?
+  createdAt      DateTime              @default(now())
+
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  orderItem OrderItem?     @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  createdBy User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  // Satu item pesanan hanya boleh punya SATU pencatatan per tipe.
+  // Ini mencegah stok ditahan atau dikembalikan dua kali.
+  @@unique([orderItemId, type])
+  @@index([variantId, createdAt])
+  @@map("inventory_movements")
+}
+
+// =====================================================
+// PENGATURAN, KONTEN, AUDIT
+// =====================================================
+
 // Satu baris saja (singleton), id selalu "main".
 model StoreSetting {
-  id                String   @id @default("main")
-  storeName         String   @default("SOLESPACE")
-  description       String?
-  whatsappNumber    String   @default("6281234567890") // format internasional, tanpa +, spasi, atau tanda hubung
-  address           String?
-  openingHours      String?
-  dpPercentage      Int      @default(50)
-  lowStockThreshold Int      @default(5)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                  String   @id @default("main")
+  storeName           String   @default("SOLESPACE")
+  tagline             String?
+  description         String?
+  logoUrl             String?
+  whatsappNumber      String   @default("6281234567890") // internasional, tanpa +, spasi, atau tanda hubung
+  email               String?
+  address             String?
+  mapUrl              String?
+  openingHours        String?
+  pickupInstructions  String?
+  dpPercentage        Int      @default(50)
+  lowStockThreshold   Int      @default(5)
+  paymentInstructions String? // info rekening: JANGAN ditampilkan publik
+  announcementText    String?
+  promoBannerTitle    String?
+  promoBannerText     String?
+  promoBannerImageUrl String?
+  footerText          String?
+  instagramUrl        String?
+  facebookUrl         String?
+  tiktokUrl           String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@map("store_settings")
+}
+
+// Halaman informasi yang bisa diedit admin (Tentang Kami, FAQ, kebijakan, dll.)
+model ContentPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("content_pages")
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  action     String   // contoh: "product.create", "order.status_change"
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  admin User? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@map("activity_logs")
 }
