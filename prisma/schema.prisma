@@ -427,3 +427,13 @@ model ActivityLog {
   @@index([entityType, entityId])
   @@map("activity_logs")
 }
+
+// Pencatat percobaan login gagal (untuk pembatasan percobaan)
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String   // HMAC dari email atau IP (bukan data mentah)
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@map("login_attempts")
+}
