@@ -1,0 +1,27 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+/** Format rupiah integer, contoh: 1500000 -> "Rp1.500.000" */
+export function formatRupiah(amount: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  })
+    .format(amount)
+    .replace(/\s/g, "");
+}
+
+/** Format tanggal Indonesia, contoh: "10 Oktober 2026" */
+export function formatTanggal(date: Date | string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(date));
+}

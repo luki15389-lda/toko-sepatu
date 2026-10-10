@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Satu baris saja (singleton), id selalu "main".
+model StoreSetting {
+  id                String   @id @default("main")
+  storeName         String   @default("SOLESPACE")
+  description       String?
+  whatsappNumber    String   @default("6281234567890") // format internasional, tanpa +, spasi, atau tanda hubung
+  address           String?
+  openingHours      String?
+  dpPercentage      Int      @default(50)
+  lowStockThreshold Int      @default(5)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("store_settings")
+}
