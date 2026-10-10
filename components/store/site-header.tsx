@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { getStoreSettings } from "@/lib/data/store";
 import { MobileNav, type NavLink } from "@/components/store/mobile-nav";
+import { CartButton } from "@/components/store/cart-button";
 
 const NAV_LINKS: NavLink[] = [
   { label: "Beranda", href: "/" },
@@ -64,6 +65,7 @@ export async function SiteHeader() {
             />
           </div>
         </form>
+        <CartButton />
       </div>
     </header>
   );

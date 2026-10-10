@@ -25,3 +25,12 @@ export function formatTanggal(date: Date | string): string {
     timeZone: "Asia/Jakarta",
   }).format(new Date(date));
 }
+
+/** Format tanggal dan jam Indonesia (WIB), contoh: "10 Oktober 2026 pukul 14.30" */
+export function formatTanggalWaktu(date: Date | string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(date));
+}

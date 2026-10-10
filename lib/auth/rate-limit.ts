@@ -10,7 +10,7 @@ const MAX_FAILURES_PER_IP = 20;
 export type LoginKeys = { emailKey: string; ipKey: string };
 
 // Email dan IP tidak disimpan mentah, hanya hasil HMAC-nya.
-function sign(value: string): string {
+export function sign(value: string): string {
   return createHmac("sha256", process.env.AUTH_SECRET ?? "")
     .update(value)
     .digest("hex");
@@ -57,4 +57,15 @@ export async function recordLoginFailure(keys: LoginKeys): Promise<void> {
 
 export async function clearEmailFailures(keys: LoginKeys): Promise<void> {
   await prisma.loginAttempt.deleteMany({ where: { key: keys.emailKey } });
+}
+
+/** Penghitung umum (dipakai untuk membatasi pembuatan pesanan). */
+export async function countHits(key: string, windowMs: number): Promise<number> {
+  return prisma.loginAttempt.count({
+    where: { key, createdAt: { gte: new Date(Date.now() - windowMs) } },
+  });
+}
+
+export async function recordHit(key: string): Promise<void> {
+  await prisma.loginAttempt.create({ data: { key } });
 }

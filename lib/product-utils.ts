@@ -16,3 +16,15 @@ export function getStockInfo(totalStock: number, lowThreshold: number) {
   }
   return { level: "ok" as StockLevel, text: "Tersedia" };
 }
+
+/** Apakah produk (beserta merek dan kategorinya) boleh dijual ke publik. */
+export function isPublicProduct(p: {
+  isPublished: boolean;
+  archivedAt: Date | null;
+  brand: { isActive: boolean };
+  category: { isActive: boolean };
+}): boolean {
+  return (
+    p.isPublished && p.archivedAt === null && p.brand.isActive && p.category.isActive
+  );
+}
