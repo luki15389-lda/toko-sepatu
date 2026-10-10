@@ -7,6 +7,7 @@ const SHOP_LINKS = [{ label: "Semua Produk", href: "/products" }];
 const INFO_LINKS = [
   { label: "Tentang Kami", href: "/about" },
   { label: "Kontak", href: "/contact" },
+  { label: "Lokasi Toko", href: "/contact#lokasi" },
   { label: "FAQ", href: "/faq" },
   { label: "Kebijakan Toko", href: "/policies" },
 ];
