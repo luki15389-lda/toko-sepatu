@@ -34,8 +34,8 @@ type NavItem = {
 const NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, ready: true },
   { label: "Produk", href: "/admin/products", icon: Package, ready: false },
-  { label: "Kategori", href: "/admin/categories", icon: Tag, ready: false },
-  { label: "Merek", href: "/admin/brands", icon: Tag, ready: false },
+  { label: "Kategori", href: "/admin/categories", icon: Tag, ready: true },
+  { label: "Merek", href: "/admin/brands", icon: Tag, ready: true },
   { label: "Pesanan", href: "/admin/orders", icon: ShoppingBag, ready: false },
   { label: "Pembayaran", href: "/admin/payments", icon: Wallet, ready: false },
   { label: "Pelanggan", href: "/admin/customers", icon: Users, ready: false },
