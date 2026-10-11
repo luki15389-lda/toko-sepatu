@@ -18,6 +18,7 @@ import {
   type TaxonomyFormValues,
 } from "@/lib/validations/taxonomy";
 import { cn } from "@/lib/utils";
+import { TaxonomyImageCell } from "@/components/admin/taxonomy-image-cell";
 
 export type TaxonomyItem = {
   id: string;
@@ -26,12 +27,14 @@ export type TaxonomyItem = {
   description: string | null;
   isActive: boolean;
   productCount: number;
+  imageUrl?: string | null;
 };
 
 type Actions = {
   save: (id: string | null, values: TaxonomyFormValues) => Promise<ActionResult>;
   remove: (id: string) => Promise<ActionResult>;
   toggle: (id: string, isActive: boolean) => Promise<ActionResult>;
+  setImage?: (id: string, url: string | null) => Promise<ActionResult>;
 };
 
 const inputClass =
@@ -228,9 +231,12 @@ export function TaxonomyManager({
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-stone-line bg-white">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-stone-line bg-mist text-xs uppercase tracking-wider text-neutral-500">
               <tr>
+                {actions.setImage && (
+                  <th scope="col" className="px-5 py-3 font-semibold">Foto</th>
+                )}
                 <th scope="col" className="px-5 py-3 font-semibold">Nama</th>
                 <th scope="col" className="px-5 py-3 font-semibold">Slug</th>
                 <th scope="col" className="px-5 py-3 text-right font-semibold">Produk</th>
@@ -243,6 +249,16 @@ export function TaxonomyManager({
                 const busy = busyId === item.id;
                 return (
                   <tr key={item.id} className={cn(busy && "opacity-60")}>
+                    {actions.setImage && (
+                      <td className="px-5 py-4">
+                        <TaxonomyImageCell
+                          id={item.id}
+                          name={item.name}
+                          imageUrl={item.imageUrl ?? null}
+                          setImage={actions.setImage}
+                        />
+                      </td>
+                    )}
                     <td className="px-5 py-4">
                       <p className="font-semibold">{item.name}</p>
                       {item.description && (

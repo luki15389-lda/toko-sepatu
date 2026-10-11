@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/admin/login-form";
+import { Logo } from "@/components/shared/logo";
 
 export const metadata: Metadata = {
   title: "Masuk Admin",
@@ -11,9 +12,7 @@ export default function AdminLoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-mist px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <p className="font-display text-3xl font-extrabold tracking-tight">
-            SOLESPACE
-          </p>
+          <Logo name="SOLESPACE" className="justify-center" />
           <p className="mt-1 text-sm text-neutral-500">Panel Admin</p>
         </div>
 

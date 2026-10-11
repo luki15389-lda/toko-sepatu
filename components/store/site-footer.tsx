@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getStoreSettings } from "@/lib/data/store";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { Logo } from "@/components/shared/logo";
 
 const SHOP_LINKS = [
   { label: "Semua Produk", href: "/products" },
@@ -35,9 +36,7 @@ export async function SiteFooter() {
     <footer className="mt-16 bg-ink text-neutral-300">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-2xl font-extrabold tracking-tight text-white">
-            {s.storeName}
-          </p>
+          <Logo name={s.storeName} invert className="text-white" />
           {(s.tagline || s.description) && (
             <p className="mt-3 max-w-xs text-sm leading-relaxed">
               {s.tagline ?? s.description}

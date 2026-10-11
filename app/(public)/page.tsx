@@ -18,6 +18,7 @@ import {
   getLatestProducts,
 } from "@/lib/data/products";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { cn } from "@/lib/utils";
 
 const ADVANTAGES = [
   {
@@ -88,7 +89,7 @@ export default async function HomePage() {
     <>
       {/* HERO */}
       <section className="border-b border-stone-line">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-20">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:py-12">
           <div>
             <p className="mb-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em]">
               <span className="inline-block h-0.5 w-8 bg-accent" aria-hidden />
@@ -120,7 +121,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-mist lg:aspect-square">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-mist lg:aspect-auto lg:h-[420px]">
             {/* Letakkan foto hero di public/images/hero.jpg.
                 Selama file itu belum ada, placeholder yang tampil. */}
             <SafeImage
@@ -146,20 +147,34 @@ export default async function HomePage() {
               <li key={c.id}>
                 <Link
                   href={`/categories/${c.slug}`}
-                  className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl bg-mist p-4 transition hover:bg-ink hover:text-paper"
+                  className={cn(
+                    "group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl bg-mist p-4 transition",
+                    !c.imageUrl && "hover:bg-ink hover:text-paper"
+                  )}
                 >
                   {c.imageUrl && (
-                    <SafeImage
-                      src={c.imageUrl}
-                      alt=""
-                      fill
-                      sizes="(min-width: 768px) 25vw, 50vw"
-                      className="object-cover opacity-70 transition group-hover:scale-105"
-                    />
+                    <>
+                      <SafeImage
+                        src={c.imageUrl}
+                        alt=""
+                        fill
+                        sizes="(min-width: 768px) 25vw, 50vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
+                      />
+                    </>
                   )}
-                  <span className="relative">
+                  <span className={cn("relative", c.imageUrl && "text-white")}>
                     <span className="block text-lg font-bold">{c.name}</span>
-                    <span className="text-xs opacity-70">
+                    <span
+                      className={cn(
+                        "text-xs",
+                        c.imageUrl ? "text-white/80" : "opacity-70"
+                      )}
+                    >
                       {c.productCount} produk
                     </span>
                   </span>

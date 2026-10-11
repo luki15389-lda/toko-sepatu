@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, Search, X } from "lucide-react";
+import { Logo } from "@/components/shared/logo";
+import { isActivePath, type NavLink } from "@/lib/nav";
+import { cn } from "@/lib/utils";
 
-export type NavLink = { label: string; href: string };
+export type { NavLink } from "@/lib/nav";
 
 export function MobileNav({
   links,
@@ -14,6 +18,24 @@ export function MobileNav({
   storeName: string;
 }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDialogElement>(null);
+  const pathname = usePathname();
+
+  // <dialog> tampil di lapisan paling atas browser, tidak terkurung oleh navbar
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  // Halaman di belakang tidak ikut bergulir saat menu terbuka
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <div className="md:hidden">
@@ -27,23 +49,20 @@ export function MobileNav({
         <Menu className="size-5" aria-hidden />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setOpen(false)}
-            aria-hidden
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu navigasi"
-            className="absolute inset-y-0 left-0 flex w-80 max-w-[85%] flex-col bg-white p-5 shadow-xl"
-          >
+      <dialog
+        ref={ref}
+        aria-label="Menu navigasi"
+        onClose={() => setOpen(false)}
+        onClick={(e) => {
+          // klik area gelap di luar panel menutup menu
+          if (e.target === ref.current) setOpen(false);
+        }}
+        className="fixed inset-y-0 left-0 m-0 h-dvh max-h-none w-80 max-w-[85%] overflow-y-auto bg-white p-0 shadow-xl backdrop:bg-black/50"
+      >
+        {open && (
+          <div className="flex min-h-full flex-col p-5">
             <div className="mb-6 flex items-center justify-between">
-              <span className="font-display text-xl font-extrabold tracking-tight">
-                {storeName}
-              </span>
+              <Logo name={storeName} />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -75,22 +94,29 @@ export function MobileNav({
 
             <nav aria-label="Menu utama">
               <ul className="space-y-1">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-lg px-3 py-3 text-base font-semibold hover:bg-mist"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {links.map((link) => {
+                  const active = isActivePath(pathname, link.href);
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "block rounded-xl px-4 py-3 text-base font-semibold transition",
+                          active ? "bg-ink text-paper" : "hover:bg-mist"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </nav>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
     </div>
   );
 }

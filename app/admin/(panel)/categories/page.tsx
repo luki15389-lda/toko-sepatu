@@ -7,6 +7,7 @@ import {
 } from "@/lib/actions/admin/categories";
 import { requireAdmin } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
+import { setCategoryImage } from "@/lib/actions/admin/taxonomy-image";
 
 export const metadata: Metadata = { title: "Kategori" };
 
@@ -21,6 +22,7 @@ export default async function AdminCategoriesPage() {
       slug: true,
       description: true,
       isActive: true,
+      imageUrl: true,
       _count: { select: { products: true } },
     },
   });
@@ -36,12 +38,14 @@ export default async function AdminCategoriesPage() {
         slug: r.slug,
         description: r.description,
         isActive: r.isActive,
+        imageUrl: r.imageUrl,
         productCount: r._count.products,
       }))}
       actions={{
         save: saveCategory,
         remove: deleteCategory,
         toggle: setCategoryActive,
+        setImage: setCategoryImage,
       }}
     />
   );

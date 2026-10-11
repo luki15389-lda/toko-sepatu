@@ -36,7 +36,7 @@ export function ProductCard({
   const finalPrice = percent ? product.discountPrice! : product.price;
 
   return (
-    <article className="group">
+    <article className="group min-w-0">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-mist">
           <SafeImage
@@ -62,17 +62,19 @@ export function ProductCard({
           )}
         </div>
 
-        <div className="mt-3 space-y-1">
+        <div className="mt-3 min-w-0 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
             {product.brand}
           </p>
           <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug">
             {product.name}
           </h3>
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-bold">{formatRupiah(finalPrice)}</span>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className="text-[15px] font-bold sm:text-base">
+              {formatRupiah(finalPrice)}
+            </span>
             {percent && (
-              <span className="text-sm text-neutral-400 line-through">
+              <span className="text-xs text-neutral-400 line-through sm:text-sm">
                 {formatRupiah(product.price)}
               </span>
             )}
