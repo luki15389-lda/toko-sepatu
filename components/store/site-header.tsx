@@ -9,6 +9,7 @@ const NAV_LINKS: NavLink[] = [
   { label: "Semua Produk", href: "/products" },
   { label: "Tentang Kami", href: "/about" },
   { label: "Kontak", href: "/contact" },
+  { label: "Cek Pesanan", href: "/orders" },
 ];
 
 export async function SiteHeader() {

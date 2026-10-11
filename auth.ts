@@ -40,7 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           user?.passwordHash ?? DUMMY_HASH
         );
 
-        if (!user || !passwordOk || !user.isActive || user.role !== "ADMIN") {
+        if (!user || !passwordOk || !user.isActive) {
           await recordLoginFailure(keys);
           return null;
         }

@@ -27,6 +27,18 @@ type Props = {
   searchParams: Promise<{ t?: string | string[] }>;
 };
 
+const HISTORY_KIND_LABEL: Record<string, string> = {
+  ORDER: "Pesanan",
+  PAYMENT: "Pembayaran",
+  FULFILLMENT: "Pengambilan",
+};
+
+const HISTORY_VALUE_LABEL: Record<string, Record<string, string>> = {
+  ORDER: ORDER_STATUS_LABEL,
+  PAYMENT: PAYMENT_STATUS_LABEL,
+  FULFILLMENT: FULFILLMENT_STATUS_LABEL,
+};
+
 async function OrderContent({ params, searchParams }: Props) {
   const { orderNumber } = await params;
   const { t } = await searchParams;
@@ -117,6 +129,24 @@ async function OrderContent({ params, searchParams }: Props) {
             <MessageCircle className="size-4" aria-hidden />
             Kirim Konfirmasi via WhatsApp
           </a>
+        </section>
+      )}
+
+      {order.history.length > 0 && (
+        <section aria-label="Perkembangan pesanan" className="mt-8">
+          <h2 className="mb-3 text-lg font-bold">Perkembangan pesanan</h2>
+          <ol className="space-y-4">
+            {[...order.history].reverse().map((h) => (
+              <li key={h.id} className="border-l-2 border-stone-300 pl-4 text-sm">
+                <p className="font-semibold">
+                  {HISTORY_KIND_LABEL[h.kind] ?? h.kind}:{" "}
+                  {HISTORY_VALUE_LABEL[h.kind]?.[h.toValue] ?? h.toValue}
+                </p>
+                <p className="text-xs text-neutral-500">{formatTanggalWaktu(h.createdAt)}</p>
+                {h.note && <p className="mt-1 text-neutral-700">{h.note}</p>}
+              </li>
+            ))}
+          </ol>
         </section>
       )}
 

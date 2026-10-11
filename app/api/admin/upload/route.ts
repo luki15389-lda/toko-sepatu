@@ -16,6 +16,7 @@ export async function POST(request: Request) {
 
   const admin = await getAdmin();
   if (!admin) return error("Tidak diizinkan.", 401);
+  if (admin.role !== "ADMIN") return error("Akun demo tidak dapat mengunggah.", 403);
 
   let form: FormData;
   try {

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 
-/** Mengembalikan admin aktif, atau null jika belum login / tidak berhak. */
+/** Mengembalikan pengguna panel aktif (ADMIN atau DEMO), atau null. */
 export const getAdmin = cache(async () => {
   const session = await auth();
   const id = session?.user?.id;
@@ -16,7 +16,7 @@ export const getAdmin = cache(async () => {
     select: { id: true, name: true, email: true, role: true, isActive: true },
   });
 
-  if (!user || !user.isActive || user.role !== "ADMIN") return null;
+  if (!user || !user.isActive) return null;
   return user;
 });
 
@@ -28,11 +28,14 @@ export async function requireAdmin() {
 }
 
 /**
- * Untuk Server Action dan Route Handler: lempar error jika tidak berhak.
- * WAJIB dipanggil di awal setiap aksi yang mengubah data.
+ * Untuk Server Action dan Route Handler yang MENGUBAH data.
+ * Akun demo hanya boleh melihat, jadi ditolak di sini.
  */
 export async function requireAdminAction() {
   const admin = await getAdmin();
   if (!admin) throw new Error("Tidak diizinkan.");
+  if (admin.role !== "ADMIN") {
+    throw new Error("Akun demo hanya dapat melihat data.");
+  }
   return admin;
 }

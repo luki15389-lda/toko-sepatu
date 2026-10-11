@@ -313,9 +313,39 @@ async function seedCatalog() {
   console.log(`✅ Katalog demo siap (${products.length} produk)`);
 }
 
+async function seedDemo() {
+  const email = process.env.DEMO_EMAIL?.trim().toLowerCase();
+  const password = process.env.DEMO_PASSWORD ?? "";
+
+  if (!email || !password) {
+    console.log("• Akun demo dilewati (DEMO_EMAIL / DEMO_PASSWORD kosong)");
+    return;
+  }
+  if (password.length < 8) {
+    throw new Error("DEMO_PASSWORD minimal 8 karakter.");
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    console.log(`• Akun demo ${email} sudah ada`);
+    return;
+  }
+
+  await prisma.user.create({
+    data: {
+      name: "Admin Demo",
+      email,
+      passwordHash: await hash(password, 12),
+      role: "DEMO",
+    },
+  });
+  console.log(`✅ Akun demo dibuat: ${email}`);
+}
+
 // ---------------------------------------------------------------
 async function main() {
   await seedAdmin();
+  await seedDemo();
   await seedSettings();
   await seedCatalog();
 }

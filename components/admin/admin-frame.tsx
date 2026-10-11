@@ -39,12 +39,12 @@ const NAV: NavItem[] = [
   { label: "Merek", href: "/admin/brands", icon: Tag, ready: true },
   { label: "Pesanan", href: "/admin/orders", icon: ShoppingBag, ready: true },
   { label: "Pembayaran", href: "/admin/payments", icon: Wallet, ready: true },
-  { label: "Pelanggan", href: "/admin/customers", icon: Users, ready: false },
+  { label: "Pelanggan", href: "/admin/customers", icon: Users, ready: true },
   { label: "Stok", href: "/admin/inventory", icon: Boxes, ready: true },
-  { label: "Laporan", href: "/admin/reports", icon: ChartColumn, ready: false },
+  { label: "Laporan", href: "/admin/reports", icon: ChartColumn, ready: true },
   { label: "Halaman", href: "/admin/pages", icon: FileText, ready: true },
   { label: "Pengaturan", href: "/admin/settings", icon: Settings, ready: true },
-  { label: "Riwayat Aktivitas", href: "/admin/activity-logs", icon: History, ready: false },
+  { label: "Riwayat Aktivitas", href: "/admin/activity-logs", icon: History, ready: true },
 ];
 
 const CRUMB_LABELS: Record<string, string> = Object.fromEntries(
@@ -143,10 +143,12 @@ function SidebarNav({
 export function AdminFrame({
   adminName,
   adminEmail,
+  isDemo = false,
   children,
 }: {
   adminName: string;
   adminEmail: string;
+  isDemo?: boolean;
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -257,7 +259,18 @@ export function AdminFrame({
           </div>
         </header>
 
-        <main className="p-4 sm:p-6">{children}</main>
+        <main className="p-4 sm:p-6">
+          {isDemo && (
+            <p
+              role="status"
+              className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800"
+            >
+              <strong>Mode demo:</strong> Anda hanya bisa melihat data. Perubahan
+              data dinonaktifkan.
+            </p>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -47,6 +47,17 @@ export async function getOrderForCustomer(
           imageUrl: true,
         },
       },
+      history: {
+        where: { visibleToCustomer: true },
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          kind: true,
+          toValue: true,
+          note: true,
+          createdAt: true,
+        },
+      },
     },
   });
 }

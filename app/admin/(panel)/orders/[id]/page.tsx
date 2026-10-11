@@ -22,6 +22,7 @@ import {
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatRupiah, formatTanggalWaktu } from "@/lib/utils";
 import { PaymentPanel } from "@/components/admin/payment-panel";
+import { OrderAccessLink } from "@/components/admin/order-access-link";
 
 export const metadata: Metadata = { title: "Detail Pesanan" };
 
@@ -268,6 +269,16 @@ export default async function AdminOrderDetailPage({
             {settings.address && (
               <p className="mt-2 text-sm text-neutral-600">{settings.address}</p>
             )}
+          </Card>
+
+          <Card title="Tautan pesanan pelanggan">
+            <OrderAccessLink
+              orderId={order.id}
+              orderNumber={order.orderNumber}
+              customerName={order.customerName}
+              customerWhatsapp={order.customerWhatsapp}
+              storeName={settings.storeName}
+            />
           </Card>
 
           <Card title="Catatan">

@@ -2,7 +2,10 @@ import Link from "next/link";
 import { getStoreSettings } from "@/lib/data/store";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
-const SHOP_LINKS = [{ label: "Semua Produk", href: "/products" }];
+const SHOP_LINKS = [
+  { label: "Semua Produk", href: "/products" },
+  { label: "Cek Pesanan", href: "/orders" },
+];
 
 const INFO_LINKS = [
   { label: "Tentang Kami", href: "/about" },
