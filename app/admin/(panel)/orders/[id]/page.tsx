@@ -21,6 +21,7 @@ import {
 } from "@/lib/order-labels";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatRupiah, formatTanggalWaktu } from "@/lib/utils";
+import { PaymentPanel } from "@/components/admin/payment-panel";
 
 export const metadata: Metadata = { title: "Detail Pesanan" };
 
@@ -170,51 +171,25 @@ export default async function AdminOrderDetailPage({
             </p>
           </Card>
 
-          <Card title="Pembayaran">
-            <dl className="space-y-2.5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-neutral-600">Total pesanan</dt>
-                <dd className="text-lg font-extrabold">{formatRupiah(order.total)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-neutral-600">DP yang dianjurkan ({order.dpPercentage}%)</dt>
-                <dd className="font-semibold">{formatRupiah(order.dpAmount)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-neutral-600">Pembayaran terverifikasi</dt>
-                <dd className="font-semibold">{formatRupiah(order.paidAmount)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-stone-line pt-2.5">
-                <dt className="text-neutral-600">Sisa tagihan</dt>
-                <dd className="font-bold">{formatRupiah(remaining)}</dd>
-              </div>
-            </dl>
-
-            <h3 className="mb-2 mt-6 text-sm font-bold">Riwayat pembayaran</h3>
-            {order.payments.length === 0 ? (
-              <p className="text-sm text-neutral-500">
-                Belum ada pembayaran yang dicatat. Pencatatan dan verifikasi
-                pembayaran tersedia di menu Pembayaran.
-              </p>
-            ) : (
-              <ul className="divide-y divide-stone-line text-sm">
-                {order.payments.map((p) => (
-                  <li key={p.id} className="flex flex-wrap justify-between gap-2 py-2.5">
-                    <span>
-                      <span className="font-semibold">{PAYMENT_KIND_LABEL[p.kind] ?? p.kind}</span>{" "}
-                      · {METHOD_LABEL[p.method] ?? p.method}
-                      <span className="block text-xs text-neutral-500">
-                        {formatTanggalWaktu(p.paidAt)} ·{" "}
-                        {RECORD_STATUS_LABEL[p.status] ?? p.status}
-                        {p.verifiedBy ? ` oleh ${p.verifiedBy.name}` : ""}
-                      </span>
-                    </span>
-                    <span className="font-semibold">{formatRupiah(p.amount)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
+          <PaymentPanel
+            orderId={order.id}
+            orderStatus={order.status}
+            total={order.total}
+            dpAmount={order.dpAmount}
+            dpPercentage={order.dpPercentage}
+            paidAmount={order.paidAmount}
+            payments={order.payments.map((p) => ({
+              id: p.id,
+              kind: p.kind,
+              amount: p.amount,
+              method: p.method,
+              methodLabel: p.methodLabel,
+              status: p.status,
+              paidAt: p.paidAt.toISOString(),
+              verifiedByName: p.verifiedBy?.name ?? null,
+              note: p.note,
+            }))}
+          />
 
           <Card title="Riwayat status">
             <ol className="space-y-4">

@@ -15,7 +15,8 @@
     "db:seed": "prisma db seed",
     "db:check": "tsx scripts/db-check.ts",
     "test:concurrency": "tsx --conditions=react-server scripts/test-concurrency.ts",
-    "test:cancel": "tsx --conditions=react-server scripts/test-cancel.ts"
+    "test:cancel": "tsx --conditions=react-server scripts/test-cancel.ts",
+    "test:payment": "tsx --conditions=react-server scripts/test-payment.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

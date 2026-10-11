@@ -34,3 +34,8 @@ export function formatTanggalWaktu(date: Date | string): string {
     timeZone: "Asia/Jakarta",
   }).format(new Date(date));
 }
+
+/** Tanggal hari ini menurut WIB, format YYYY-MM-DD. */
+export function todayWib(): string {
+  return new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}

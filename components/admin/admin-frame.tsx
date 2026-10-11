@@ -20,6 +20,7 @@ import {
   Users,
   Wallet,
   X,
+  FileText,
 } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
@@ -37,11 +38,12 @@ const NAV: NavItem[] = [
   { label: "Kategori", href: "/admin/categories", icon: Tag, ready: true },
   { label: "Merek", href: "/admin/brands", icon: Tag, ready: true },
   { label: "Pesanan", href: "/admin/orders", icon: ShoppingBag, ready: true },
-  { label: "Pembayaran", href: "/admin/payments", icon: Wallet, ready: false },
+  { label: "Pembayaran", href: "/admin/payments", icon: Wallet, ready: true },
   { label: "Pelanggan", href: "/admin/customers", icon: Users, ready: false },
-  { label: "Stok", href: "/admin/inventory", icon: Boxes, ready: false },
+  { label: "Stok", href: "/admin/inventory", icon: Boxes, ready: true },
   { label: "Laporan", href: "/admin/reports", icon: ChartColumn, ready: false },
-  { label: "Pengaturan", href: "/admin/settings", icon: Settings, ready: false },
+  { label: "Halaman", href: "/admin/pages", icon: FileText, ready: true },
+  { label: "Pengaturan", href: "/admin/settings", icon: Settings, ready: true },
   { label: "Riwayat Aktivitas", href: "/admin/activity-logs", icon: History, ready: false },
 ];
 
