@@ -33,3 +33,8 @@ export const FULFILLMENT_STATUS_LABEL: Record<string, string> = {
   PICKED_UP: "Sudah Diambil",
   CANCELLED: "Dibatalkan",
 };
+
+export function paymentLabel(status: string, dpPercentage: number): string {
+  if (status === "DP_PARTIAL") return `DP ${dpPercentage}% Terverifikasi`;
+  return PAYMENT_STATUS_LABEL[status] ?? status;
+}
