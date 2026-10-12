@@ -22,6 +22,7 @@ const publicSettingSelect = {
   promoBannerTitle: true,
   promoBannerText: true,
   promoBannerImageUrl: true,
+  heroImages: true,
   footerText: true,
   instagramUrl: true,
   facebookUrl: true,
@@ -45,6 +46,7 @@ export type PublicStoreSettings = {
   promoBannerTitle: string | null;
   promoBannerText: string | null;
   promoBannerImageUrl: string | null;
+  heroImages: string[];
   footerText: string | null;
   instagramUrl: string | null;
   facebookUrl: string | null;
@@ -68,6 +70,7 @@ const FALLBACK: PublicStoreSettings = {
   promoBannerTitle: null,
   promoBannerText: null,
   promoBannerImageUrl: null,
+  heroImages: [],
   footerText: null,
   instagramUrl: null,
   facebookUrl: null,

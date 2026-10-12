@@ -19,6 +19,8 @@ import {
 } from "@/lib/data/products";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
+import { NavMarker } from "@/components/store/nav-marker";
+import { HeroSlider } from "@/components/store/hero-slider";
 
 const ADVANTAGES = [
   {
@@ -87,6 +89,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <NavMarker page="home" />
       {/* HERO */}
       <section className="border-b border-stone-line">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:py-12">
@@ -121,18 +124,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-mist lg:aspect-auto lg:h-[420px]">
-            {/* Letakkan foto hero di public/images/hero.jpg.
-                Selama file itu belum ada, placeholder yang tampil. */}
-            <SafeImage
-              src="/images/hero.jpg"
-              alt="Koleksi sneakers pilihan"
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
+            <HeroSlider images={settings.heroImages} alt="Koleksi sneakers pilihan" />
         </div>
       </section>
 

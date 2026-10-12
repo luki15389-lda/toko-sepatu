@@ -44,3 +44,21 @@ h1, h2, h3, h4 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Menu aktif.
+   1) Tampilan pertama dari server: hanya ada satu halaman di DOM, jadi :has() akurat.
+   2) Setelah JavaScript aktif: mengikuti halaman yang benar-benar terlihat
+      (Next.js menyimpan halaman yang baru dikunjungi dalam keadaan tersembunyi). */
+body:not([data-nav-js]):has([data-nav-page="home"]) [data-nav="home"],
+body:not([data-nav-js]):has([data-nav-page="products"]) [data-nav="products"],
+body:not([data-nav-js]):has([data-nav-page="about"]) [data-nav="about"],
+body:not([data-nav-js]):has([data-nav-page="contact"]) [data-nav="contact"],
+body:not([data-nav-js]):has([data-nav-page="orders"]) [data-nav="orders"],
+body[data-nav-page="home"] [data-nav="home"],
+body[data-nav-page="products"] [data-nav="products"],
+body[data-nav-page="about"] [data-nav="about"],
+body[data-nav-page="contact"] [data-nav="contact"],
+body[data-nav-page="orders"] [data-nav="orders"] {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}

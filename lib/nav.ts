@@ -1,22 +1,10 @@
-export type NavLink = { label: string; href: string };
+export type NavId = "home" | "products" | "about" | "contact" | "orders";
+export type NavLink = { id: NavId; label: string; href: string };
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "Beranda", href: "/" },
-  { label: "Semua Produk", href: "/products" },
-  { label: "Tentang Kami", href: "/about" },
-  { label: "Kontak", href: "/contact" },
-  { label: "Cek Pesanan", href: "/orders" },
+  { id: "home", label: "Beranda", href: "/" },
+  { id: "products", label: "Semua Produk", href: "/products" },
+  { id: "about", label: "Tentang Kami", href: "/about" },
+  { id: "contact", label: "Kontak", href: "/contact" },
+  { id: "orders", label: "Cek Pesanan", href: "/orders" },
 ];
-
-/** Apakah menu `href` sedang aktif untuk alamat `pathname`. */
-export function isActivePath(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
-  if (href === "/products") {
-    return (
-      pathname === "/products" ||
-      pathname.startsWith("/products/") ||
-      pathname.startsWith("/categories/")
-    );
-  }
-  return pathname === href || pathname.startsWith(`${href}/`);
-}

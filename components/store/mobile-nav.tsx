@@ -2,13 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Menu, Search, X } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
-import { isActivePath, type NavLink } from "@/lib/nav";
-import { cn } from "@/lib/utils";
-
-export type { NavLink } from "@/lib/nav";
+import type { NavLink } from "@/lib/nav";
 
 export function MobileNav({
   links,
@@ -19,7 +15,6 @@ export function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDialogElement>(null);
-  const pathname = usePathname();
 
   // <dialog> tampil di lapisan paling atas browser, tidak terkurung oleh navbar
   useEffect(() => {
@@ -94,24 +89,18 @@ export function MobileNav({
 
             <nav aria-label="Menu utama">
               <ul className="space-y-1">
-                {links.map((link) => {
-                  const active = isActivePath(pathname, link.href);
-                  return (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "block rounded-xl px-4 py-3 text-base font-semibold transition",
-                          active ? "bg-ink text-paper" : "hover:bg-mist"
-                        )}
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  );
-                })}
+                {links.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={link.href}
+                      data-nav={link.id}
+                      onClick={() => setOpen(false)}
+                      className="block rounded-xl px-4 py-3 text-base font-semibold transition hover:bg-mist"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>

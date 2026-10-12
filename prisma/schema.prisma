@@ -390,6 +390,7 @@ model StoreSetting {
   promoBannerTitle    String?
   promoBannerText     String?
   promoBannerImageUrl String?
+  heroImages          String[] @default([])
   footerText          String?
   instagramUrl        String?
   facebookUrl         String?

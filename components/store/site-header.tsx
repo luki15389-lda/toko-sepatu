@@ -1,44 +1,10 @@
-import { Suspense } from "react";
 import Link from "next/link";
-import { Menu, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { CartButton } from "@/components/store/cart-button";
 import { MobileNav } from "@/components/store/mobile-nav";
-import { NavLinks } from "@/components/store/nav-links";
 import { getStoreSettings } from "@/lib/data/store";
 import { NAV_LINKS } from "@/lib/nav";
-
-/** Tampilan sementara menu desktop (tanpa tanda aktif) sampai alamat halaman diketahui. */
-function NavLinksFallback() {
-  return (
-    <ul className="flex items-center gap-1">
-      {NAV_LINKS.map((link) => (
-        <li key={link.href}>
-          <Link
-            href={link.href}
-            className="rounded-full px-3.5 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-mist hover:text-ink"
-          >
-            {link.label}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** Tombol menu sementara dengan ukuran sama, agar tata letak tidak bergeser. */
-function MobileNavFallback() {
-  return (
-    <div className="md:hidden">
-      <span
-        aria-hidden
-        className="flex size-10 items-center justify-center rounded-full"
-      >
-        <Menu className="size-5" />
-      </span>
-    </div>
-  );
-}
 
 export async function SiteHeader() {
   const settings = await getStoreSettings();
@@ -46,18 +12,26 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-stone-line bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6">
-        <Suspense fallback={<MobileNavFallback />}>
-          <MobileNav links={NAV_LINKS} storeName={settings.storeName} />
-        </Suspense>
+        <MobileNav links={NAV_LINKS} storeName={settings.storeName} />
 
         <Link href="/" aria-label={`${settings.storeName} - Beranda`}>
           <Logo name={settings.storeName} />
         </Link>
 
         <nav aria-label="Menu utama" className="ml-6 hidden md:block">
-          <Suspense fallback={<NavLinksFallback />}>
-            <NavLinks links={NAV_LINKS} />
-          </Suspense>
+          <ul className="flex items-center gap-1">
+            {NAV_LINKS.map((link) => (
+              <li key={link.id}>
+                <Link
+                  href={link.href}
+                  data-nav={link.id}
+                  className="rounded-full px-3.5 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-mist hover:text-ink"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
 
         <form
